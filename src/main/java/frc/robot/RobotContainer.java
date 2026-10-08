@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.simpleArm.*;
+import frc.robot.util.LoggedTalon.TalonFX.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -54,6 +56,8 @@ public class RobotContainer {
     // Simulation stuff - Don't worry about it
     private SwerveDriveSimulation driveSimulation = null;
 
+    private final SimpleArm simpleArm;
+
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         switch (Constants.currentMode) {
@@ -66,6 +70,7 @@ public class RobotContainer {
                         new ModuleIOTalonFX(TunerConstants.BackLeft),
                         new ModuleIOTalonFX(TunerConstants.BackRight),
                         (robotPose) -> {});
+                simpleArm = null;
                 break;
 
             case SIM:
@@ -80,6 +85,7 @@ public class RobotContainer {
                         new ModuleIOSim(driveSimulation.getModules()[2]),
                         new ModuleIOSim(driveSimulation.getModules()[3]),
                         driveSimulation::setSimulationWorldPose);
+                simpleArm = new SimpleArm(new SimpleArmSim(10, defaultCANBus, "Simple Arm"));
                 break;
 
             default:
@@ -91,6 +97,8 @@ public class RobotContainer {
                         new ModuleIO() {},
                         new ModuleIO() {},
                         (robotPose) -> {});
+
+                simpleArm = new SimpleArm(new NoOppTalonFX("SimpleMotor", 0));
                 break;
         }
 
@@ -126,6 +134,7 @@ public class RobotContainer {
                 ? () -> drive.resetOdometry(driveSimulation.getSimulatedDriveTrainPose())
                 : () -> drive.resetOdometry(new Pose2d(drive.getPose().getTranslation(), new Rotation2d()));
         controller.start().onTrue(Commands.runOnce(resetOdometry).ignoringDisable(true));
+        controller.a().whileTrue(simpleArm.spinSpinSpin());
     }
 
     /**

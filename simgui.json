@@ -40,6 +40,12 @@
     "transitory": {
       "AdvantageKit": {
         "Motors": {
+          "Simple Arm": {
+            "double[]##v_/AdvantageKit/Motors/Simple Arm/AppliedVolts": {
+              "open": true
+            },
+            "open": true
+          },
           "SimpleArm": {
             "double[]##v_/AdvantageKit/Motors/SimpleArm/SupplyCurrentAmps": {
               "open": true
